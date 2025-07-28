@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="../../styles/global.css">
+
+        <style>
+            h2{
+                font-size: 30px;
+                margin-bottom: 10px;
+            }
+
+            .option{
+                font-size: 20px;
+                border-top: 1px solid rgb(194, 208, 219); 
+                border-bottom: 1px solid rgb(194, 208, 219); 
+                padding-left: 20px;
+            }
+
+            #poll_description{
+                font-size: 15px;
+                color: grey;
+            }
+
+            .vote_button{
+                padding: 10px 10px;
+                margin-top: 30px;
+                font-size: 20px;
+                color: white;
+                background-color: rgb(48, 48, 109);
+                transition: 00.1s ease;
+                border-radius: 5px;
+                border: 2px solid black;
+            }
+
+            .vote_button:hover{
+                transform: scale(1.1);
+                box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
+            }
+
+            #back_button{
+                color: white;
+                background-color: rgb(48, 48, 109);
+                padding: 10px 10px;
+                font-size: 13px;
+                display: block;
+                margin: 0 auto;
+                margin-top: 10px;
+                width:20%;
+            }
+
+            .option_images{
+                width: 20%;
+                border-radius: 10px;
+            }
+
+            .option_description{
+                color: gray;
+                font-size: 15px;
+                display: block;
+            }
+
+
+            #send_suggestion{
+                color: white;
+                background-color: rgb(48, 48, 109);
+                padding: 10px 10px;
+                font-size: 13px;
+                display: block;
+                margin: 0 auto;
+                margin-top: 10px;
+                width:20%;
+                border-radius: 10px;
+                transition: 0.1s ease;
+            }
+
+            #send_suggestion:hover{
+                transform: scale(1.1);
+            }
+
+            #suggestion_text{
+                font-size: 15px;
+                padding: 5px 5px;
+                border-radius: 5px;
+
+            }
+            #title{
+                font-size: 20px;
+            }
+
+            #container{
+                text-align: left;
+            }
+
+            #options{
+                margin-top: 0;
+                border: 2px solid black;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                width: 90%;
+                height: 400px;
+                border-radius: 10px;
+            }
+
+            #suggestions{
+                margin-top: 0;
+                border: 2px solid black;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                width: 90%;
+                height: 300px;
+                border-radius: 10px; 
+            }
+
+            #title{
+                margin-bottom: 0px;
+            }
+
+            .suggestion{
+                padding: 20px 10px;
+                border-bottom: 1px solid grey;
+            }
+
+            .suggestion:nth-child(2n), .option:nth-child(2n){
+                background-color: rgb(245, 249, 255);
+            }
+
+            #toggle{
+                font-size: 25px;
+                padding: 10px 10px;
+                border-radius: 10px;
+            }
+
+            .green{
+                background-color: green;
+            }
+
+            .red{
+                background-color: red;
+            }
+
+        </style>
+        <script src="../../functions/htmlRequest.js"></script>
+    </head>
+
+    <body>
+
+        <div id="header">
+            <span id="page_title">
+                <h1>Votemaster - Hall administration - View Poll</h1>
+            </span>
+            <div id="menu_buttons">
+                <a href = "../../backend/logout.php" class="menu_button">Logout</a>
+            </div>
+        </div>
+
+        <div id="container">
+            <a id="back_button" href="../">Back</a>
+            <button id="toggle" class="green" onclick="toggle()">Start Poll</button>
+            <div id="title"></div>
+            <strong>Options:</strong>
+            <div id="options"></div>
+            <br><strong>Client suggestions:</strong>
+            <div id="suggestions"></div>
+        </div>
+
+        <script>
+            adminCheck();
+            let poll = $_GET('id');
+            let response = postRequest("../../backend/hall_getpollinfo.php", {poll_id: poll});
+
+            if(response.data.poll_info.active == 1){
+                document.getElementById("toggle").innerHTML="Stop Poll";
+                document.getElementById("toggle").classList.add("red");
+                document.getElementById("toggle").classList.remove("green");
+            } 
+
+            let title = response.data.poll_info.poll_name;
+            document.getElementById("title").innerHTML = '<strong>Title:</strong> ' + title + "<br><strong>Description:</strong> <span id='poll_description'>" + response.data.poll_info.poll_description + '</span><br>';
+
+            let options = "";
+            for (const option of response.data.poll_options) {
+                options += "<div class = 'option'><strong>" + (option.option_name) + "</strong> <br> <span class='option_description'>" + (option.option_description) +"<br> <span style='color:green;'><strong> VOTES - " + option.option_votes + "</strong></span> </span> <img class='option_images' src='../../images/option_images/" + option.option_image + "'>  <br></div>";
+            }
+            document.getElementById("options").innerHTML = options;
+
+            response = postRequest("../../backend/hall_getsuggestions.php", {poll_id: poll});
+            suggestions = "";
+            for (const sug of response.data) {
+                suggestions += "<div class = 'suggestion'>" + (sug) + "</div>";
+            }
+            document.getElementById("suggestions").innerHTML = suggestions;
+
+            function toggle(){
+                postRequest("../../backend/hall_togglepoll.php", {poll_id: poll});
+                if(document.getElementById("toggle").innerHTML == "Stop Poll"){
+                    document.getElementById("toggle").innerHTML="Start Poll";
+                } else {
+                    document.getElementById("toggle").innerHTML="Stop Poll";
+                }
+                document.getElementById("toggle").classList.toggle("red");
+                document.getElementById("toggle").classList.toggle("green");
+            }
+
+        </script>
+    </body>
+
+</html>

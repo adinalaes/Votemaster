@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Create new poll</title>
+        <style>
+
+            html, body{
+                text-align: center;
+                background-color:rgb(239, 250, 253);
+            }
+
+            #poll_container{
+                background-color: white;
+                margin: 0 auto;
+                text-align: center;
+                border-radius: 15px;
+                box-shadow: 0px 0px 10px rgba(0,0,0, 0.5);
+                display:inline-block;
+                padding: 20px 20px;
+            }
+
+            #register{
+                font-size: 20px;
+                padding: 20px 20px;
+                background-color:rgb(28, 28, 66);
+                color: white;
+                transition: 0.1s ease;
+                border-radius: 30px;
+            }
+
+            #register:hover{
+                transform: scale(1.1);
+                box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2); 
+            }
+
+            #message{
+                color: red;
+            }
+
+            input[type=text], input[type=password]{
+                padding: 5px 5px;
+                border-radius: 10px;
+                border: 1px solid rgb(28, 28, 66); 
+            }
+
+            h1{
+                margin-bottom: 40px;
+            }
+
+            #account{
+                color: rgb(28, 28, 66);
+            }
+
+        </style>
+        <script src="../functions/htmlRequest.js"></script>
+    </head>
+
+    <body>
+        
+        <div id="poll_container">
+
+            <h1>Votemaster - Create new poll</h1>
+
+            Poll name<br>
+            <input type="text" name="first_name" id="poll_name"><br>
+            City<br>
+            <input type="text" name="city" id="city"><br>
+            Poll description<br>
+            <input type="text" name="description" id="description"><br>
+            Image<br>
+            <input type="file" name="image" id="image"><br>
+
+            Option 1<br>
+            <input type="text" name="option1" id="option1"><br>
+            Option 1 image<br>
+            <input type="file" name="option1_image" id="option1_image"><br>
+            Option 1 description<br>
+            <input type="text" name="option1_description" id="option1_description"><br>
+
+            Option 2<br>
+            <input type="text" name="option2" id="option2"><br>
+            Option 2 image<br>
+            <input type="file" name="option2_image" id="option2_image"><br>
+            Option 2 description<br>
+            <input type="text" name="option2_description" id="option2_description"><br>
+
+            Option 3<br>
+            <input type="text" name="option3" id="option3"><br>
+            Option 3 image<br>
+            <input type="file" name="option3_image" id="option3_image"><br>
+            Option 3 description<br>
+            <input type="text" name="option3_description" id="option3_description"><br>
+
+            Option 4<br>
+            <input type="text" name="option4" id="option4"><br>
+            Option 4 image<br>
+            <input type="file" name="option4_image" id="option4_image"><br>
+            Option 4 description<br>
+            <input type="text" name="option4_description" id="option4_description"><br>
+
+        </div>
+
+        <script>
+
+            adminCheck();
+
+            let poll = $_GET('id');
+            let response = postRequest("../../backend/hall_getpollinfo.php", {poll_id: poll});
+
+            let title = response.data.poll_info.poll_name;
+            document.getElementById("title").innerHTML = '<strong>Title:</strong> ' + title + "<br><strong>Description:</strong> <span id='poll_description'>" + response.data.poll_info.poll_description + '</span><br>';
+
+
+            let options = "";
+            for (const option of response.data.poll_options) {
+                options += "<div class = 'option'><strong>" + (option.option_name) + "</strong> <br> <span class='option_description'>" + (option.option_description) +" </span> <img class='option_images' src='../../images/option_images/" + option.option_image + "'>  <br></div>";
+            }
+
+            document.getElementById("options").innerHTML = options;
+
+
+            response = postRequest("../../backend/hall_getsuggestions.php", {poll_id: poll});
+            suggestions = "";
+            for (const sug of response.data) {
+                suggestions += "<div class = 'suggestion'>" + (sug) + "</div>";
+            }
+
+            document.getElementById("suggestions").innerHTML = suggestions;
+            
+        </script>
+
+    </body>
+</html>

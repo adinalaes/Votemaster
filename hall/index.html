@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VOTEMASTER-Hall</title>
+
+    <link rel="stylesheet" href="../styles/global.css">
+    <style>
+        
+        .poll{
+            border-top: 1px solid rgb(199, 204, 230);
+            padding: 10px 10px;
+            background-color: white;
+            transition: 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+
+        .poll_picture{
+            border-radius: 10px;
+            width:15%;
+            float: left;
+        }
+
+        .settings_button{
+            float: right;
+            background-color: red;
+            color: black;
+            padding: 10px 10px;
+        }
+
+        #title{
+            margin-bottom: 0px;
+        }
+
+        #new{
+            background-color: rgb(104, 225, 255);
+            border-radius: 10px;
+            font-size: 25px;
+            padding: 15px 15px;
+            border: 2px solid rgb(21, 21, 68);
+            margin-bottom: 20px;
+            transition: 0.1s ease;
+        }
+        #new:hover{
+            transform: scale(1.1);
+            box-shadow: 0px 0px 10px rgb(104, 225, 255);
+        }
+
+    </style>
+
+    
+    <script src="../functions/htmlRequest.js"></script>
+</head>
+
+<body>
+
+    <div id="header">
+        <span id="page_title">
+            <h1>Votemaster - Hall administration</h1>
+        </span>
+        <div id="menu_buttons">
+            <a href = "../backend/logout.php" class="menu_button">Logout</a>
+        </div>
+    </div>
+
+    <div id="container">
+        <div id="title"></div>
+        <a href="new_poll/" id="new">Create new Poll</a>
+        <div id="polls"></div>
+    </div>
+
+
+<script>
+
+    adminCheck();
+
+    let response = postRequest("../backend/hall_getpolls.php", {});
+    if(response.status == 0 && response.code == 100){
+        window.location.href = "login/";
+    }
+
+    document.getElementById("title").innerHTML = "<h2>Poll history " + response.data.city + "</h2>";
+
+    
+
+    let polls = "";
+    for(const el of response.data.polls){
+        let act = " <span style='color:green;' >[ACTIVE] </span>";
+        if(el.active == 0){
+            act = " <span style='color:red;'>[INACTIVE] </span>";
+        }
+        polls += "<div class='poll'><img class='poll_picture' src='../images/" + el.poll_picture + "'><strong>" + el.poll_name + act + "</strong><a class = 'settings_button' href = 'poll_admin/?id=" + el.poll_id + "'>Settings</a></div>";
+    }
+    document.getElementById("polls").innerHTML = polls;
+
+
+</script>
+
+</body>
+</html>

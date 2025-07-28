@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>VOTEMASTER - Hall - Register</title>
+        <style>
+
+            html, body{
+                text-align: center;
+                background-color:rgb(239, 250, 253);
+            }
+
+            #register_container{
+                background-color: white;
+                margin: 0 auto;
+                text-align: center;
+                border-radius: 15px;
+                box-shadow: 0px 0px 10px rgba(0,0,0, 0.5);
+                display:inline-block;
+                padding: 20px 20px;
+            }
+
+            #register{
+                font-size: 20px;
+                padding: 10px 10px;
+                background-color:rgb(28, 28, 66);
+                color: white;
+                transition: 0.1s ease;
+                border-radius: 10px;
+            }
+
+            #register:hover{
+                transform: scale(1.1);
+                box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2); 
+            }
+
+            #message{
+                color: red;
+            }
+
+            input[type=text], input[type=password]{
+                padding: 5px 5px;
+                border-radius: 10px;
+                border: 1px solid rgb(28, 28, 66); 
+            }
+
+            h1{
+                margin-bottom: 40px;
+            }
+
+            #account{
+                color: rgb(28, 28, 66);
+            }
+
+        </style>
+        <script src="../../functions/htmlRequest.js"></script>
+    </head>
+
+    <body>
+        
+        <div id="register_container">
+
+            <h1>Votemaster - Create your Hall acccount</h1>
+
+            
+            Email<br>
+            <input type="text" name="email" id="email"><br>
+            Password<br>
+            <input type="password" name="pass" id="pass"><br><br>
+            Document attesting your townhall representative status<br>
+            <input type="file"><br>  
+
+            <br>
+            <label for="city">City:</label>
+            <select name="city" id="city" value="1"></select>
+            <br>
+
+            <br><button id="register" onclick="register()"><strong>Register as Hall</strong></button><br><br>
+
+            <span id="message"></span><br>
+
+            <a href="../login" id="account">This city is already in the system. Log In.</a>
+
+            
+        </div>
+
+        <script>
+
+            let result_cities = postRequest("../../backend/getcities.php", {});
+            let cit = "";
+            for(let key in result_cities){
+                cit += "<option value='" + (parseInt(key)+1) + "'>" + result_cities[key] + "</option>";
+            }
+            document.getElementById("city").innerHTML = cit;
+
+            function register(){
+                let email = document.getElementById("email").value;
+                let password = document.getElementById("pass").value;
+                let city = document.getElementById("city").value;
+
+                let response = postRequest("../../backend/hall_register.php", {email:email, password:password, city_id: city});
+                console.log(response);
+                if(response.status == true){
+                    window.location.href = "../login";
+                } else {
+                    document.getElementById("message").innerHTML = response.message;
+                }
+            }
+            
+        </script>
+
+    </body>
+</html>

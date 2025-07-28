@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>VOTEMASTER</title>
+
+    <link rel="stylesheet" href="styles/global.css">
+    <style>
+        
+        .poll{
+            border-top: 1px solid rgb(199, 204, 230);
+            padding: 10px 10px;
+            background-color: white;
+            transition: 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .poll:hover{
+            background-color: rgb(242, 245, 247);
+        }
+
+        .poll_picture{
+            border-radius: 20px;
+            width:60%;
+        }
+
+    </style>
+
+    
+    <script src="functions/htmlRequest.js"></script>
+</head>
+
+<body>
+
+    <div id="header">
+        <span id="page_title">
+            <h1>Votemaster</h1>
+        </span>
+        <div id="menu_buttons">
+            <a href = "client/index.html" class="menu_button">My account</a>
+            <a href = "backend/logout.php" class="menu_button">Logout</a>
+        </div>
+    </div>
+
+    <div id="container">
+        <div id="title"></div>
+        <div id="polls"></div>
+    </div>
+
+
+<script>
+    let response = postRequest("backend/getpolls.php", {});
+    if(response.status == 0 && response.code == 100){
+        window.location.href = "/votemaster/login";
+    }
+
+    document.getElementById("title").innerHTML = "<h2>Polls " + response.data.city + "</h2>";
+
+    let polls = "";
+    for(const el of response.data.polls){
+        polls += "<a href='poll/?id=" + el.poll_id + "'><div class='poll'><h3>" + el.poll_name + "</h3><br><img class='poll_picture' src='images/" + el.poll_picture + "'></div></a>";
+    }
+    document.getElementById("polls").innerHTML = polls;
+
+
+</script>
+
+</body>
+</html>

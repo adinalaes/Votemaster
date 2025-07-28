@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="../styles/global.css">
+
+        <style>
+            h2{
+                font-size: 30px;
+                margin-bottom: 10px;
+            }
+
+            .option{
+                padding: 30px 10px;
+                font-size: 25px;
+                border-top: 2px solid rgb(194, 208, 219); 
+                padding-bottom: 50px;
+            }
+
+            #poll_description{
+                font-size: 20px;
+            }
+
+            .vote_button{
+                padding: 10px 10px;
+                margin-top: 30px;
+                font-size: 20px;
+                color: white;
+                background-color: rgb(48, 48, 109);
+                transition: 00.1s ease;
+                border-radius: 5px;
+                border: 2px solid black;
+            }
+
+            .vote_button:hover{
+                transform: scale(1.1);
+                box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
+            }
+
+            #back_button{
+                color: white;
+                background-color: rgb(48, 48, 109);
+                padding: 10px 10px;
+                font-size: 13px;
+                display: block;
+                margin: 0 auto;
+                margin-top: 10px;
+                width:20%;
+            }
+
+            .option_images{
+                width: 90%;
+                border-radius: 20px;
+            }
+
+            .option_description{
+                color: gray;
+                font-size: 20px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+            .voted{
+                background-color: yellow;
+                color: black;
+                border: 2px solid rgb(216, 185, 10);
+            }
+
+            .voted_else{
+                background-color: lightgrey;
+                color: rgb(61, 61, 61);
+                border: 2px solid black;
+            }
+
+            #send_suggestion{
+                color: white;
+                background-color: rgb(48, 48, 109);
+                padding: 10px 10px;
+                font-size: 13px;
+                display: block;
+                margin: 0 auto;
+                margin-top: 10px;
+                width:20%;
+                border-radius: 10px;
+                transition: 0.1s ease;
+            }
+
+            #send_suggestion:hover{
+                transform: scale(1.1);
+            }
+
+            #suggestion_text{
+                font-size: 15px;
+                padding: 5px 5px;
+                border-radius: 5px;
+
+            }
+
+        </style>
+        <script src="../functions/htmlRequest.js"></script>
+    </head>
+
+    <body>
+
+        <div id="header">
+            <span id="page_title">
+                <h1>Votemaster - View Poll</h1>
+            </span>
+            <div id="menu_buttons">
+                <a href = "../client" class="menu_button">My account</a>
+                <a href = "../backend/logout.php" class="menu_button">Logout</a>
+            </div>
+        </div>
+
+        <div id="container">
+            <a id="back_button" href="../">Back</a>
+            <div id="title"></div>
+            <div id="options"></div>
+
+            <hr>Send your own suggestion<br><br>
+            <input type="text" id="suggestion_text">
+            <button id="send_suggestion" onclick="suggest()">Send suggestion</button>
+        </div>
+
+        <script>
+            let poll = $_GET('id');
+            let response = postRequest("../backend/getpollinfo.php", {poll_id: poll});
+
+            if(response.status == 0 && response.code == 100){
+                window.location.href = "/votemaster/login";
+            }
+
+            let title = response.data.poll_info.poll_name;
+            document.getElementById("title").innerHTML = '<h2>' + title + " </h2> <span id='poll_description'>" + response.data.poll_info.poll_description + '</span>';
+
+            let options = "";
+            for (const option of response.data.poll_options) {
+                options += "<div class = 'option'><strong>" + (option.option_name) + "</strong> <br> <span class='option_description'>" + (option.option_description) +" </span> <img class='option_images' src='../images/option_images/" + option.option_image + "'>  <br> <button id='vote_button_" + option.option_id + "' class='vote_button' onclick = 'vote(" + option.option_id + ")'><strong>Vote</strong></button> </div>";
+            }
+            document.getElementById("options").innerHTML = options;
+
+            set_voted(response.data.poll_vote);
+
+
+
+
+            function vote(o_id){
+                let response = postRequest("../backend/vote.php", {option_id: o_id});
+                if(response.status == true){
+                    set_voted(o_id);
+                }
+            }
+
+            function set_voted(o_id){
+                if(o_id != 0){
+                    let buttons = document.getElementsByClassName("vote_button");
+                    for(const but of buttons){
+                        but.innerHTML = "<strong>Change Vote</strong>";
+                        but.classList.add("voted_else");
+                    }
+
+                    document.getElementById("vote_button_" + o_id).innerHTML = "<strong>VOTED</strong>";
+                    document.getElementById("vote_button_" + o_id).classList.remove("voted_else");
+                    document.getElementById("vote_button_" + o_id).classList.add("voted");
+                } else {
+                    let buttons = document.getElementsByClassName("vote_button");
+                    for(const but of buttons){
+                        but.innerHTML = "<strong>Vote</strong>";
+                        but.classList.remove("voted_else");
+                        but.classList.remove("voted");
+                    }
+                }
+            }
+
+            function suggest(){
+                let suggestion = document.getElementById("suggestion_text").value;
+                document.getElementById("suggestion_text").value = "";
+                let response = postRequest("../backend/addsuggestion.php", {poll_id:poll, suggestion_text:suggestion});
+            }
+
+
+        </script>
+    </body>
+
+</html>

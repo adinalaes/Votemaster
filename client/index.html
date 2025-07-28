@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="../styles/global.css">
+        <style>
+            #container{
+                text-align: left;
+            }
+            #name{
+                font-size: 30px;
+            }
+            #email{
+                font-size: 25px;
+            }
+            #city{
+                font-size: 20px;
+                color: grey;
+            }
+            .info{
+                margin-bottom: 20px;
+            }
+            #tit_history{
+                font-size: 23px;
+                margin-left : 30px;
+            }
+            #history{
+                width: 90%;
+                margin: 0 auto;
+                border-radius: 10px;
+                border: 2px solid black;
+                height: 400px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+            }
+            .vote{
+                width:100%;
+                padding: 10px 10px;
+                border-bottom: 1px solid lightgrey;
+            }
+
+            .vote:nth-of-type(2n) {
+                background-color: rgb(238, 242, 244);
+            }
+        </style>
+        <script src="../functions/htmlRequest.js"></script>
+    </head>
+
+    <body>
+
+        <div id="header">
+            <span id="page_title">
+                <h1>Account Info</h1>
+            </span>
+            <div id="menu_buttons">
+                <a href = "../" class="menu_button">Polls</a>
+                <a href = "../backend/logout.php" class="menu_button">Logout</a>
+            </div>
+        </div>
+
+        <div id="container">
+            <div class="info" id="name"></div>
+            <div class="info" id="email"></div>
+            <div class="info" id="city"></div>
+
+            <div id="tit_history"><strong>Voting history</strong></div>
+            <div id="history"></div>
+        </div>
+
+        <script>
+            let response = postRequest("../backend/getclientinfo.php", {});
+
+            if(response.status == 0 && response.code == 100){
+                window.location.href = "/votemaster/login";
+            }
+
+            document.getElementById("name").innerHTML = "<strong>" + response.data.client_full_name + "</strong>";
+            document.getElementById("email").innerHTML = response.data.email;
+            document.getElementById("city").innerHTML = response.data.city;
+
+            let votes = "";
+            for(const vote of response.data.votes){
+                votes += "<div class='vote'>" + vote.poll_name + " - " + vote.option_name + "</div>"; 
+            }
+
+            document.getElementById("history").innerHTML = votes;
+
+        </script>
+    </body>
+</html>
